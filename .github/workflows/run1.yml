@@ -1,37 +1,27 @@
-name: Deploy2 V2Ray + FRP
-
+name: run amy 1
 on:
-#  push:                 # 初次推送或修改工作流文件时自动触发
-#    branches: [ main ]  # 指定触发分支（根据实际情况调整）
-  workflow_dispatch:    # 保留手动触发能力
   schedule:
-#    - cron: '0 */6 * * *'  # 每6小时运行一次（UTC时间）
+#    - cron: '0 */6 * * *'  # 每6小时运行一次[5,7](@ref)
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 防止超时（免费账户单次运行上限6小时）
+    timeout-minutes: 360  # 设置最长运行6小时[6](@ref)
     steps:
-      - name: Setup V2Ray
-        run: |
-          # 解压并安装V2Ray
-          wget -O v2ray.zip https://raw.githubusercontent.com/mmxdxmm/v2ray/refs/heads/main/v2ray-linux-64.zip
-          unzip *.zip
-          chmod -R 755 ./v2ray/*
-          cd v2ray
-          wget -O config.json https://raw.githubusercontent.com/mmxdxmm/v2ray-config/main/config.json
-          
-      - name: Deploy FRP Client
-        run: |
-          # 下载并解压FRP
-          cd v2ray
-          wget https://chmlfrp.cn/dw/ChmlFrp-0.51.2_240715_linux_amd64.tar.gz -O frp.tar.gz
-          tar -xzvf frp.tar.gz
-          chmod -R 755 ./ChmlFrp-0.51.2_240715_linux_amd64
+    - name: Download and setup amy4Server
+      run: |
+        wget -O amy4Server.zip https://raw.githubusercontent.com/mmxdxmm/amy4Server/refs/heads/main/amy4Server_amd64.zip
+        unzip amy4Server.zip
+        sudo mkdir -p /usr/local/amy4Server/
+        sudo cp -r ./amy4Server/* /usr/local/amy4Server/
+        cd /usr/local/amy4Server/
+        sudo chmod 777 ./*
+        sudo wget https://chmlfrp.cn/dw/ChmlFrp-0.51.2_240715_linux_amd64.tar.gz -O ChmlFrp-0.51.2_240715_linux_amd64.tar.gz
+        sudo tar -xvf ChmlFrp-0.51.2_240715_linux_amd64.tar.gz
+        sudo chmod 777 ./ChmlFrp-0.51.2_240715_linux_amd64/*
 
-      - name: run v2ray and frp
-        run: |
-          # 运行v2ray和frp
-          cd v2ray
-          ls
-          ./v2ray run -config ./config.json  2>&1 | grep -v "Warning" & ./ChmlFrp-0.51.2_240715_linux_amd64/frpc -u ${{ secrets.FRP_USER }} -p 115953
+    - name: Start services
+      run: |
+        cd /usr/local/amy4Server/
+        ./amy4Server -config ./amy4Server.json & sudo ./ChmlFrp-0.51.2_240715_linux_amd64/frpc -u "${{ secrets.FRP_USER }}" -p 116058
+        
