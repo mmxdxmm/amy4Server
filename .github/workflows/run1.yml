@@ -1,6 +1,7 @@
 name: run amy 1
 on:
-  schedule:
+  workflow_dispatch:    # 保留手动触发能力
+#  schedule:
 #    - cron: '0 */6 * * *'  # 每6小时运行一次[5,7](@ref)
 
 jobs:
