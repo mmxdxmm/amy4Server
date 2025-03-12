@@ -1,0 +1,11 @@
+{
+"ListenAddr": ":54321",
+"IPV6Support": false,
+"PidFile": "/usr/local/amy4Server/run.pid",
+"ClientKeys": ["45282325-d19a-4229-d296-a0717f85e4a2"],
+"AmyVerifyServer": {
+"authUser": "free",
+"authPass": "free",
+"proxyAddr": ""
+}
+}
